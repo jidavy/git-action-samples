@@ -1,0 +1,20 @@
+name: Terraform EC2
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+
+jobs:
+    terraform:
+        name: 'Terraform Deployment'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Show Artifact
+            run: ls -ltra
