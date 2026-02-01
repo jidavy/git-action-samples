@@ -11,6 +11,9 @@ jobs:
     terraform:
         name: 'Terraform Deployment'
         runs-on: ubuntu-latest
+        env:          
+            TF_IN_AUTOMATION: "true"
+            TF_INPUT: "false"
 
         steps:
             - name: Checkout repository
@@ -42,3 +45,7 @@ jobs:
             - name: Terraform Plan
               working-directory: terraform
               run: terraform plan
+
+            - name: Terraform Apply
+              working-directory: terraform              
+              run: terraform apply -auto-approve
