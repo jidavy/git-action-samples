@@ -11,24 +11,25 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-# This resource ensures Terraform can "see" your default VPC
-resource "aws_default_vpc" "default" {
-  tags = {
-    Name = "Default VPC"
-  }
+# 1. Look up your specific VPC by ID
+data "aws_vpc" "manual_vpc" {
+  id = "vpc-002855cca3304ddd7"
 }
 
-# This resource adopts one of the default subnets (e.g., in availability zone 'a')
-resource "aws_default_subnet" "default_az1" {
-  availability_zone = "eu-west-1a"
+# 2. Automatically find the subnets that belong to that VPC
+data "aws_subnets" "manual_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.manual_vpc.id]
+  }
 }
 
 resource "aws_instance" "new-node" {
   ami           = "ami-096f46d460613bed4"
   instance_type = "t3.micro"
   
-  # By explicitly linking to the default subnet, you bypass the VPC error
-  subnet_id     = aws_default_subnet.default_az1.id
+  # 3. Use the first available subnet found in that VPC
+  subnet_id     = data.aws_subnets.manual_subnets.ids[0]
 
   tags = {
     Name = "new-node"
